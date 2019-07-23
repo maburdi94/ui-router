@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Router</title>
+    </head>
+
+    <body>
+        <a href="">Home</a>
+        <a is="router-link" href="/page1">Page 1</a>
+        <a is="router-link" href="/page2">Page 2</a>
+        <a is="router-link" href="/page3">Page 3</a>
+
+        <router-outlet id="router" config="config"></router-outlet>
+
+        <script>
+            function url(url) {
+                return async () =>
+                    await fetch(url).then(res => res.text());
+            }
+
+            var config = {
+                router: [
+                    {
+                        path: "/page1",
+                        render: () => `
+                            <div style="background-color: red; height: 400px;">
+                                <h3>Page 1</h3>
+                            </div>
+                        `
+                    },
+                    {
+                        path: "/page2",
+                        render: url("./views/_page2.html"),
+                        exact: true
+                    },
+                    {
+                        path: "/page3",
+                        render: url("./views/_page3.html")
+                    }
+                ]
+            }
+
+
+        </script>
+
+        <script src="./router.js"></script>
+    </body>
+</html>
