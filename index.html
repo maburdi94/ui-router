@@ -5,26 +5,31 @@
     </head>
 
     <body>
+
         <a href="">Home</a>
-        <a is="router-link" href="/page1">Page 1</a>
+        <a is="router-link" href="/page1/bark">Page 1</a>
         <a is="router-link" href="/page2">Page 2</a>
         <a is="router-link" href="/page3">Page 3</a>
 
         <router-outlet id="router" config="config"></router-outlet>
 
+        <script type="module" src="router.js" onload="loaded()"></script>
         <script>
+
             function url(url) {
                 return async () =>
                     await fetch(url).then(res => res.text());
             }
 
-            var config = {
-                router: [
+
+            function loaded() {
+                let router = Router.routes([
                     {
-                        path: "/page1",
-                        render: () => `
+                        path: "/page1/:id",
+                        render: ({id}) => `
                             <div style="background-color: red; height: 400px;">
                                 <h3>Page 1</h3>
+                                <h4>ID: ${id}</h4>
                             </div>
                         `
                     },
@@ -37,12 +42,21 @@
                         path: "/page3",
                         render: url("./views/_page3.html")
                     }
-                ]
+                ]);
+
+
+                window.config = {
+                    router
+                };
+
+
+                // Progressive enhancement.
+                // Wait until globals are added to the scope.
+                let routerElements = document.createElement('script');
+                routerElements.src = "router-elements.js";
+                document.body.appendChild(routerElements);
             }
 
-
         </script>
-
-        <script src="./router.js"></script>
     </body>
 </html>

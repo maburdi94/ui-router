@@ -1,68 +1,19 @@
 
-
-customElements.define('router-link', class extends HTMLAnchorElement {
-    constructor() {
-        super();
-        this.href = "#" + this.getAttribute('href');
-    }
-}, {extends: "a"});
+import {pathToRegexp} from "./path-to-regexp.js";
 
 
+class Router {
+    static routes(routes) {
+        if (!routes instanceof Array) return;
 
-customElements.define('router-outlet', class extends HTMLElement {
-
-    #config = {
-        router: []
-    };
-
-    get router() {
-        return this.#config.router;
-    }
-
-    connectedCallback() {
-
-        if (this.hasAttribute('config')) {
-            let config = this.getAttribute('config');
-
-            try {
-                config = JSON.parse(config);    // JSON
-            } catch (e) {
-                config = window[config];    // Global variable
-            }
-
-            if (!(config.router && config.router instanceof Array)) {
-                throw "Router outlet needs array of routes";
-            }
-
-            this.#config = config;
+        for (let route of routes) {
+            route.regexp = pathToRegexp(route.path, route.keys = []);
         }
 
-        window.addEventListener('hashchange', this.routeChange.bind(this));
-        window.addEventListener('load', this.routeChange.bind(this));
+        return routes;
     }
 
-    disconnectedCallback() {
-        window.removeEventListener('hashchange', this.routeChange.bind(this));
-        window.removeEventListener('load', this.routeChange.bind(this));
-    }
+}
 
-    async routeChange(event) {
-        let path = location.hash.slice(1);
-        let dest = this.router.find(one => {
-            if (one.exact) {
-                return one.path === path;
-            } else {
-                return path.startsWith(one.path);
-            }
-        });
 
-        if (dest) {
-            this.innerHTML =  await dest.render();
-        }
-    }
-
-    constructor() {
-        super();
-    }
-});
-
+window.Router = Router;
