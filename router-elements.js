@@ -29,9 +29,7 @@ customElements.define('router-outlet', class extends HTMLElement {
                 config = window[config];    // Global variable
             }
 
-            console.log(config);
-
-            if (!(config && config.router instanceof Array)) {
+            if (!(config && config.router)) {
                 throw "Router outlet needs array of routes";
             }
 
@@ -50,15 +48,10 @@ customElements.define('router-outlet', class extends HTMLElement {
     async routeChange(event) {
         let path = location.hash.slice(1);
 
-        let dest = this.router.find(one => one.regexp.test(path));
-        let matches = dest.regexp.exec(path);
-
-        let params = dest.keys.reduce((params, key, i) => {
-            params[key.name] =  matches[i + 1];
-            return params;
-        }, {});
+        let dest = this.router.routes.find(route => route.isMatch(path));
 
         if (dest) {
+            let params = dest.exec(path);
             this.innerHTML =  await dest.render(params);
         }
     }

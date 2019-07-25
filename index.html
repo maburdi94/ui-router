@@ -7,7 +7,8 @@
     <body>
 
         <a href="">Home</a>
-        <a is="router-link" href="/page1/bark">Page 1</a>
+        <a is="router-link" href="/page/bark">Bark</a>
+        <a is="router-link" href="/page/123">123</a>
         <a is="router-link" href="/page2">Page 2</a>
         <a is="router-link" href="/page3">Page 3</a>
 
@@ -25,13 +26,29 @@
             function loaded() {
                 let router = Router.routes([
                     {
-                        path: "/page1/:id",
-                        render: ({id}) => `
-                            <div style="background-color: red; height: 400px;">
-                                <h3>Page 1</h3>
-                                <h4>ID: ${id}</h4>
-                            </div>
-                        `
+                        path: "/page",
+                        children: [
+                            {
+                                path: '',
+                                render: url("./views/_page1.html")
+                            },
+                            {
+                                path: "/bark",
+                                render: () => `
+                                    <div style="background-color: purple; height: 400px;">
+                                        <h3>Bark!</h3>
+                                    </div>
+                                `
+                            },
+                            {
+                                path: "/:id",
+                                render: ({id}) => `
+                                    <div style="background-color: red; height: 400px;">
+                                        <h3>${id}</h3>
+                                    </div>
+                                `
+                            },
+                        ]
                     },
                     {
                         path: "/page2",
