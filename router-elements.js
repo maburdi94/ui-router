@@ -29,26 +29,21 @@ customElements.define('router-outlet', class extends HTMLElement {
                 config = window[config];    // Global variable
             }
 
-            if (!(config && config.router)) {
-                throw "Router outlet needs array of routes";
-            }
-
             this.#config = config;
         }
 
         window.addEventListener('hashchange', this.routeChange.bind(this));
-        window.addEventListener('load', this.routeChange.bind(this));
+        window.addEventListener('load', this.routeChange.bind(this), { once: true });
     }
 
     disconnectedCallback() {
         window.removeEventListener('hashchange', this.routeChange.bind(this));
-        window.removeEventListener('load', this.routeChange.bind(this));
     }
 
     async routeChange(event) {
         let path = location.hash.slice(1);
 
-        let dest = this.router.routes.find(route => route.isMatch(path));
+        let dest = this.router.match(path);
 
         if (dest) {
             let params = dest.exec(path);

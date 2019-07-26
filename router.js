@@ -1,33 +1,33 @@
 
-import {pathToRegexp} from "./path-to-regexp.js";
-
 class Route {
+
     #regexp;
-    #keys = [];
+
+    path = '';
+    render = () => `<p>${this.path}</p>`;
 
     exec(path) {
-        let matches = this.#regexp.exec(path);
-        return this.#keys.reduce((params, key, i) => {
-            params[key.name] =  matches[i + 1];
-            return params;
-        }, {});
+        return this.#regexp.exec(path).groups;
     }
 
-    isMatch(path) {
+    test(path) {
         return this.#regexp.test(path);
     }
 
-    constructor({
-        path = '',
-        render = () => `<p>${this.path}</p>`,
-        exact = false
-    }) {
-        this.#regexp = pathToRegexp(path, this.#keys);
+    constructor(config) {
 
-        this.path = path;
-        this.exact = exact;
+        // Assign only relevant props
+        for (const prop in config) {
+            if (prop in this) this[prop] = config[prop];
+        }
 
-        this.render = render;
+        // Replace /:param with named capture group
+        let reStr = '^' + this.path.replace(/:(\w+)/ig, '(?<$1>\\S+)');
+
+        // Exact regex match
+        if (config.exact) reStr += '$';
+
+        this.#regexp = new RegExp(reStr);
     }
 }
 
@@ -35,19 +35,24 @@ class Router {
 
     routes = [];
 
+    match(path) {
+        return this.routes.find(route => route.test(path));
+    }
+
     constructor(routes) {
 
-        this.routes = routes.flatMap(route => configureRoute(route));
+        // Base config
+        let config = { path: '' };
 
-        function configureRoute(config, root = '') {
+        // Flatten children
+        this.routes = routes.flatMap(function configureRoute(config) {
             if (config.children) {
-                return config.children.flatMap(childRoute => configureRoute(childRoute, root + config.path));
+                return config.children.flatMap(configureRoute.bind(config));
             } else {
-                return [new Route({...config, path: root + config.path})];
+                let path = this.path + config.path;
+                return [new Route({...config, path})];
             }
-        }
-
-        console.log(this);
+        }.bind(config));
     }
 
     static routes(routes) {

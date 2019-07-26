@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
     <head>
+        <base href=".">
         <title>Router</title>
     </head>
 
@@ -18,8 +19,11 @@
         <script>
 
             function url(url) {
-                return async () =>
-                    await fetch(url).then(res => res.text());
+                let cached;
+                return async () => (
+                    cached = cached ||
+                        await fetch(url).then(res => res.text())
+                );
             }
 
 
@@ -30,7 +34,8 @@
                         children: [
                             {
                                 path: '',
-                                render: url("./views/_page1.html")
+                                exact: true,
+                                render: url("views/_page1.html")
                             },
                             {
                                 path: "/bark",
@@ -52,12 +57,12 @@
                     },
                     {
                         path: "/page2",
-                        render: url("./views/_page2.html"),
+                        render: url("views/_page2.html"),
                         exact: true
                     },
                     {
                         path: "/page3",
-                        render: url("./views/_page3.html")
+                        render: url("views/_page3.html")
                     }
                 ]);
 
@@ -67,8 +72,6 @@
                 };
 
 
-                // Progressive enhancement.
-                // Wait until globals are added to the scope.
                 let routerElements = document.createElement('script');
                 routerElements.src = "router-elements.js";
                 document.body.appendChild(routerElements);
