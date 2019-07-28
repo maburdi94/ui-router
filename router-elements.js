@@ -47,6 +47,7 @@ customElements.define('router-outlet', class extends HTMLElement {
 
         if (dest) {
             let params = dest.exec(path);
+
             this.innerHTML =  await dest.render(params);
         }
     }

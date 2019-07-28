@@ -9,7 +9,8 @@
 
         <a href="">Home</a>
         <a is="router-link" href="/page/bark">Bark</a>
-        <a is="router-link" href="/page/123">123</a>
+        <a href="#/page/123">123</a>
+        <a is="router-link" href="/page/123/file/vacation_2019.jpg">FileName</a>
         <a is="router-link" href="/page2">Page 2</a>
         <a is="router-link" href="/page3">Page 3</a>
 
@@ -47,11 +48,26 @@
                             },
                             {
                                 path: "/:id",
-                                render: ({id}) => `
-                                    <div style="background-color: red; height: 400px;">
-                                        <h3>${id}</h3>
-                                    </div>
-                                `
+                                children: [
+                                    {
+                                        path: '',
+                                        exact: true,
+                                        render: ({id}) => `
+                                            <div style="background-color: red; height: 400px;">
+                                                <h3>ID: ${id}</h3>
+                                            </div>
+                                        `,
+                                    },
+                                    {
+                                        path: '/file/:fileName',
+                                        render: ({id, fileName}) => `
+                                            <div style="background-color: red; height: 400px;">
+                                                <h3>ID: ${id}</h3>
+                                                <h3>File Name: ${fileName}</h3>
+                                            </div>
+                                        `,
+                                    }
+                                ]
                             },
                         ]
                     },

@@ -22,7 +22,7 @@ class Route {
         }
 
         // Replace /:param with named capture group
-        let reStr = '^' + this.path.replace(/:(\w+)/ig, '(?<$1>\\S+)');
+        let reStr = '^' + this.path.replace(/:(\w+)/ig, '(?<$1>[\\w.-]+)');
 
         // Exact regex match
         if (config.exact) reStr += '$';
@@ -46,13 +46,16 @@ class Router {
 
         // Flatten children
         this.routes = routes.flatMap(function configureRoute(config) {
+            config.path = this.path + config.path;
             if (config.children) {
                 return config.children.flatMap(configureRoute.bind(config));
             } else {
-                let path = this.path + config.path;
-                return [new Route({...config, path})];
+                return [new Route(config)];
             }
         }.bind(config));
+
+
+        console.log(this);
     }
 
     static routes(routes) {
